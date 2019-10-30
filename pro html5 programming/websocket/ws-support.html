@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>浏览器支持情况检测</title>
+</head>
+<body>
+	<div id="support"></div>
+<script type="text/javascript">
+	loadDemo();
+
+	function loadDemo() {
+		if (window.WebSocket) {
+			document.getElementById('support').innerHTML = "HTML5 WebSocket is supported in your browser."
+		} else {
+			document.getElementById('support').innerHTML = "HTML5 WebSocket is not supported in your browser."
+		}
+	}
+</script>
+</body>
+</html>
+

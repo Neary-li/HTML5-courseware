@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>HTML5 WebSocket / Geolocation Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body onload="loadDemo()">
+    <h1>HTML5 WebSocket / Geolocation Tracker</h1>
+    <div>
+        <strong>Geolocation</strong>: 
+        <p id="geoStatus">HTML5 Geolocation is <strong>not</strong> supported in your browser.</p>
+    </div>
+    <div>
+        <strong>WebSocket</strong>: 
+        <p id="socketStatus">HTML5 Web Sockets are <strong>not</strong> supported in your browser.</p>
+    </div>
+<script>
+    // WebSocket的引用
+    var socket;
+    // 为该会话生成唯一的随机ID
+    var myId = Math.floor(100000*Math.random());
+    // 当前显示的行数
+    var rowCount = 0;
+    // 更新状态信息
+    function updateSocketStatus(message) {
+        document.getElementById("socketStatus").innerHTML = message;
+    }
+    // 更新地理位置状态信息
+    function updateGeolocationStatus(message) {
+        document.getElementById("geoStatus").innerHTML = message;
+    }
+    // Geolocation异常处理信息
+    function handleLocationError(error) {
+        switch(error.code) {
+            case 0:
+                updateGeolocationStatus("There was an error while retrieving your location: " + error.message);
+                break;
+            case 1:
+                updateGeolocationStatus("The user prevented this page from retrieving a location.");
+                break;
+            case 2:
+                updateGeolocationStatus("The browser was unable to determine your location: " + error.message);
+                break;
+            case 3:
+                updateGeolocationStatus("The browser timed out before retrieving the location.");
+                break;
+        }
+    }
+    // 页面初始加载时会调用loadDemo
+    function loadDemo() {
+        // 进行检测，确保浏览器支持sockets
+        if (window.WebSocket) {
+            // broadcast WebSocket server服务器位置
+            url = "ws://localhost:8080";
+            // 实例化WebSocket
+            socket = new WebSocket(url);
+            // 告诉用户已成功建立连接
+            socket.onopen = function() {
+                updateSocketStatus("Connected to WebSocket tracker server");
+            }
+            // 告知用户消息已送达
+            socket.onmessage = function(e) {
+                updateSocketStatus("Updated location from " + dataReturned(e.data));
+            }
+        }
+        // 检测Geolocation服务的浏览器支持情况
+        var geolocation;
+        if(navigator.geolocation) {
+            geolocation = navigator.geolocation;
+            updateGeolocationStatus("HTML5 Geolocation is supported in your browser.");
+        }
+        // 使用Geolocation API注册位置更新处理函数
+        geolocation.watchPosition(updateLocation,
+                                  handleLocationError,
+                                  {maximumAge:20000});
+    }
+    // 当新位置可用时，更新位置信息
+    function updateLocation(position) {
+        var latitude = position.coords.latitude;    //经度
+        var longitude = position.coords.longitude;  //纬度
+        var timestamp = position.timestamp;         //时间戳
+
+        updateGeolocationStatus("Location updated at " + timestamp);
+
+        // 通过WebSocket发生我的位置
+        var toSend = JSON.stringify([myId, latitude, longitude]);
+        sendMyLocation(toSend);
+    }
+    // 将位置信息发送给服务器
+    function sendMyLocation(newLocation) {
+        if (socket) {
+            socket.send(newLocation);
+        }
+    }
+
+    function dataReturned(locationData) {
+        // 从数据中拆分出 ID, 经度, 和纬度
+        var allData = JSON.parse(locationData);
+        var incomingId   = allData[1];
+        var incomingLat  = allData[2];
+        var incomingLong = allData[3];
+
+        // 根据ID定位到HTML元素
+        // 如果不存在，就创建
+        var incomingRow = document.getElementById(incomingId);
+        if (!incomingRow) {
+            incomingRow = document.createElement('div');
+            incomingRow.setAttribute('id', incomingId);
+
+            incomingRow.userText = (incomingId == myId) ?
+                                        'Me'            :
+                                        'User ' + rowCount;
+
+            rowCount++;
+
+            document.body.appendChild(incomingRow);
+        }
+        // 使用新的值更新对应行文本
+        incomingRow.innerHTML = incomingRow.userText + " \\ Lat: " +
+                                incomingLat + " \\ Lon: " +
+                                incomingLong;
+
+        return incomingRow.userText;
+    }
+</script>
+</body>
+</html>

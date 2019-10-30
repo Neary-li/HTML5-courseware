@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title></title>
+</head>
+<body>
+
+<script type="text/javascript">
+	[
+		Constructor(DOMString url, optional DOMString protocols),
+		Constructor(DOMString url, optional DOMString[] protocols)
+	]
+	interface WebSocket : EventTarget {
+		readonly attribute DOMString url;
+
+		//就绪状态
+		const unsigned short CONNECTING = 0;
+		const unsigned short OPEN = 1;
+		const unsigned short CLOSING = 2;
+		const unsigned short CLOSED = 3;
+		readonly attribute unsigned short readState;
+		readonly attribute unsigned long bufferedAmount;
+
+		//网络
+		[TreatNonCallableAsNull] attribute function ? onopen;
+		[TreatNonCallableAsNull] attribute function ? onerror;
+		[TreatNonCallableAsNull] attribute function ? onclose;
+		readonly attribute DOMString extensions;
+		readonly attribute DOMString protocol;
+		void close([Clamp] optional unsigned short code, optional DOMString reason);
+
+		//消息
+		[TreatNonCallableAsNull] attribute function ? onmessage;
+		void send(DOMString data);
+		void send(ArrayBuffer data);
+		void send(Blob data);
+
+	}
+
+ 	self.send_bytes("HTTP/1.1 101 Switching Protocols\r\n")
+    self.send_bytes("Upgrade: WebSocket\r\n")
+    self.send_bytes("Connection: Upgrade\r\n")
+    self.send_bytes("Sec-WebSocket-Accept: %s\r\n" % self.hash_key(key))
+    if "Sec-WebSocket-Protocol" in headers:
+    	protocol = headers["Sec-WebSocket-Protocol"]
+    	elf.send_bytes("Sec-WebSocket-Accept: %s\r\n" % protocol)
+    	
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test Page</title>
+</head>
+<body>
+    <input type="text" id="inputMessage" value="Hello, Web Socket!">
+    <button id="sendButton">Send</button>
+    <button id="disconnectW2">Disconnect Web Socket 2</button>
+    <pre id="output"></pre>
+<script>
+    var log = function(s) {
+        if (document.readyState !== "complete") {
+            log.buffer.push(s);
+        } else {
+            document.getElementById("output").innerText += (s + "\n")
+        }
+    }
+    log.buffer = [];
+
+    // 1.WebSockets对象的创建及其与WebSockets服务器的连接
+    url = "ws://localhost:8080/broadcast";
+    w = new WebSocket(url);     //创建新的WebSocket实例
+
+    // 连接建立时触发open事件
+    w.onopen = function() {
+        log("1: open");
+        w.send("thank you for accepting this WebSocket request");
+    }
+    // 客户端接收服务端数据时触发message事件
+    w.onmessage = function(e) {
+        log("1:" + e.data);
+    }
+    // 连接关闭时触发close事件
+    w.onclose = function(e) {
+        log("1: closed");
+    }
+    // 通信发生错误时触发error事件
+    w.onerror = function(e) {
+        log("1: error");
+    }
+
+    // 页面加载
+    window.onload = function() {
+        log(log.buffer.join("\n"))
+        document.getElementById("sendButton").onclick = function() {
+            w.send(document.getElementById("inputMessage").value);
+        }
+        document.getElementById("disconnectW2").onclick = function() {
+            w2.close();
+        }
+
+        url2 = "ws://localhost:8080/broadcast";
+        w2 = new WebSocket(url2);
+        w2.onopen = function() {
+            log("2: open");
+        }
+        w2.onmessage = function(e) {
+            log("2:" + e.data);
+        }
+        w2.onclose = function(e) {
+            log("2: closed");
+        }
+
+    }
+</script>
+</body>
+</html>
+
+
+

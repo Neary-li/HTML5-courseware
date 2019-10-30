@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>websockets API</title>
+</head>
+<body>
+	<input type="text" id="inputMessage" value="hello, WebSocket!">
+	<button id="sendButton">Send</button>
+	<pre id="output"></pre>
+
+<script type="text/javascript">
+	var log = function(s) {
+		if (document.readyState !== "complete") {
+			log.buffer.push(s);
+		} else {
+			document.getElementById("output").textContent += (s + "\n");
+		}
+	}
+	log.buffer = [];
+
+	if (this.MozWebSocket) {
+		WebSocket = MozWebSocket;
+	}
+	// 1.WebSockets对象的创建及其与WebSockets服务器的连接
+    url = "ws://localhost:8080/echo";
+    w = new WebSocket(url);     //创建新的WebSocket实例
+
+    // 连接建立时触发open事件
+    w.onopen = function() {
+        log("open");
+        // WebSocket可以发送字符串
+        w.binaryType = "arraybuffer";
+        w.send("thank you for accepting this WebSocket request");
+		// WebSocket API支持以二进制数据的形式发送Blob和ArrayBuffer
+        var a = new Uint8Array([8,6,7,5,3,0,9]);
+        w.send(a.buffer);
+    }
+    // 客户端接收服务端数据时触发message事件
+    w.onmessage = function(e) {
+    	// data属性值可以是Blob或ArrayBuffer,
+    	// 具体取决于WebSocket中binaryType属性的值。
+        log(e.data.toString());
+    }
+    // 连接关闭时触发close事件
+    w.onclose = function(e) {
+        log("closed");
+    }
+    // 通信发生错误时触发error事件
+    w.onerror = function(e) {
+        log("error");
+    }
+
+    window.onload = function() {
+    	log(log.buffer.join("\n"));
+    	document.getElementById("sendButton").onclick = function() {
+    		w.send(document.getElementById("inputMessage").value);
+    	}
+    }
+</script>
+</body>
+</html>
