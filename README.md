@@ -1,11 +1,11 @@
 # HTML5-courseware
 HTML5重要API的PPT简介
 ## 第1章 HTML5概述
-![HTML5概述](\images\1.png)  
-![HTML5概述](\images\2.png)
+![HTML5概述](https://github.com/Neary-li/HTML5-courseware/blob/master/images/1.png)  
+![HTML5概述](https://github.com/Neary-li/HTML5-courseware/blob/master/images/2.png)
 ## 第2章 Canvas API
-![Canvas](\images\3.png)  
-![Canvas](\images\4.png)
+![Canvas](https://github.com/Neary-li/HTML5-courseware/blob/master/images/3.png)  
+![Canvas](https://github.com/Neary-li/HTML5-courseware/blob/master/images/4.png)
 ## 第3章 SVG
 ![SVG](\images\5.png)  
 ![SVG](\images\6.png)
